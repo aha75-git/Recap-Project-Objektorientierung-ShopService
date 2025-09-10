@@ -2,7 +2,9 @@ import exception.OrderNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,5 +52,20 @@ public class ShopService {
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().orElse(null)));
+    }
+
+    public void printOrders() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
+
+        this.orderRepo.getOrders().forEach(order -> {
+            System.out.println("Order-ID: " + order.id());
+            System.out.println("Bestell-Status: " + order.orderStatus());
+            System.out.println("Bestelldatum: " + formatter.format(order.orderDate()));
+            System.out.println("Produkte:");
+            order.products().forEach(product -> System.out.println("\t" + product));
+            System.out.println();
+            System.out.println("#################################################");
+            System.out.println();
+        });
     }
 }

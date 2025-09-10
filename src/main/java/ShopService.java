@@ -17,8 +17,9 @@ public class ShopService {
             products.add(productToOrder);
         }
 
-        Order newOrder = new Order(UUID.randomUUID().toString(), products);
+        Order newOrder = new Order(UUID.randomUUID().toString(), products, OrderStatus.PROCESSING);
 
+        // jetzt aber
         return orderRepo.addOrder(newOrder);
     }
 }

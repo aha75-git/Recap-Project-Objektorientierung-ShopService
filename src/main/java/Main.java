@@ -1,5 +1,6 @@
 import exception.OrderNotFoundException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,7 +9,6 @@ public class Main {
         OrderRepo orderRepo = new OrderMapRepo();
         ProductRepo productRepo = new ProductRepo();
         IdService idService = () -> UUID.randomUUID().toString();
-        ShopService shopService = new ShopService(productRepo, orderRepo, idService);
 
         productRepo.addProduct(new Product("1", "Fussballschuhe"));
         productRepo.addProduct(new Product("2", "T-Shirts"));
@@ -17,11 +17,9 @@ public class Main {
         productRepo.addProduct(new Product("5", "Seife"));
         productRepo.addProduct(new Product("6", "Weichspüler"));
 
-          /*
-        Order order1 = new Order(idService.generateId());
-        Order order2 = new Order(idService.generateId());
-        Order order3 = new Order(idService.generateId());
-*/
+        ShopService shopService = new ShopService(productRepo, orderRepo, idService);
+
+/*
         List<String> productsIds1 = List.of("1", "2");
         List<String> productsIds2 = List.of("4", "5");
         List<String> productsIds3 = List.of("3", "2", "4", "6");
@@ -33,6 +31,12 @@ public class Main {
         } catch (OrderNotFoundException e) {
             System.out.println(e.getMessage());
         }
-
+*/
+        TransactionFileProcessing fileProcessing = new TransactionFileProcessing(shopService);
+        try {
+            fileProcessing.processOrder("src/transactions.txt");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());;
+        }
     }
 }

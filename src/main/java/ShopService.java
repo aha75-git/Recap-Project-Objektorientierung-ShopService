@@ -1,25 +1,54 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import exception.OrderNotFoundException;
+import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
 public class ShopService {
-    private ProductRepo productRepo = new ProductRepo();
-    private OrderRepo orderRepo = new OrderMapRepo();
+    private final ProductRepo productRepo;
+    private final OrderRepo orderRepo;
+    private final IdService idService;
 
-    public Order addOrder(List<String> productIds) {
+    public Order addOrder(List<String> productIds) throws OrderNotFoundException {
         List<Product> products = new ArrayList<>();
         for (String productId : productIds) {
-            Product productToOrder = productRepo.getProductById(productId);
-            if (productToOrder == null) {
-                System.out.println("Product mit der Id: " + productId + " konnte nicht bestellt werden!");
-                return null;
+            Optional<Product> productToOrder = productRepo.getProductById(productId);
+            if (productToOrder.isEmpty()) {
+                throw new OrderNotFoundException("Product mit der Id: " + productId + " konnte nicht bestellt werden!");
             }
-            products.add(productToOrder);
+            products.add(productToOrder.get());
         }
 
-        Order newOrder = new Order(UUID.randomUUID().toString(), products, OrderStatus.PROCESSING);
+        Order newOrder = new Order(idService.generateId(), products, OrderStatus.PROCESSING, Instant.now());
 
-        // jetzt aber
         return orderRepo.addOrder(newOrder);
+    }
+
+    public List<Order> getOrdersByStatus(OrderStatus status) {
+        return this.orderRepo.getOrders().stream()
+                .filter(order -> order.orderStatus().equals(status))
+                .toList();
+    }
+
+    public void updateOrder(String orderId, OrderStatus orderStatus) throws OrderNotFoundException {
+        var order = this.orderRepo.getOrderById(orderId);
+        if (order == null) {
+            throw new OrderNotFoundException("Bestellung mit der Id: " + orderId + " konnte nicht gefunden werden!");
+        }
+
+        this.orderRepo.removeOrder(orderId); // Kompatibilät zur List
+        this.orderRepo.addOrder(order.withOrderStatus(orderStatus));
+    }
+
+    public Map<OrderStatus, Order> getOldestOrderPerStatus() {
+        return this.orderRepo.getOrders().stream()
+                .collect(Collectors.groupingBy(Order::orderStatus,
+                        Collectors.minBy(Comparator.comparing(Order::orderDate))))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().orElse(null)));
     }
 }

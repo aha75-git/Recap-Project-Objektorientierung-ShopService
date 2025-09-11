@@ -1,4 +1,5 @@
 import exception.OrderNotFoundException;
+import exception.ProductOutOfStock;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
@@ -14,14 +15,27 @@ public class ShopService {
     private final OrderRepo orderRepo;
     private final IdService idService;
 
-    public Order addOrder(List<String> productIds) throws OrderNotFoundException {
+    public Order addOrder(Map<String, Double> productIdsWithQuantity) throws OrderNotFoundException, ProductOutOfStock {
         List<Product> products = new ArrayList<>();
-        for (String productId : productIds) {
+        //for (String productId : productIds) {
+        for (Map.Entry<String, Double> entry : productIdsWithQuantity.entrySet()) {
+            String productId = entry.getKey();
+            Double quantity = entry.getValue();
+
             Optional<Product> productToOrder = productRepo.getProductById(productId);
             if (productToOrder.isEmpty()) {
                 throw new OrderNotFoundException("Product mit der Id: " + productId + " konnte nicht bestellt werden!");
             }
-            products.add(productToOrder.get());
+            Product product = productToOrder.get();
+            if (product.isAvailable(quantity)) {
+                Product productNew = product.reduceQuantity(quantity);
+                productRepo.removeProduct(productId);
+                productRepo.addProduct(productNew);
+                products.add(productNew);
+            } else {
+                throw new ProductOutOfStock("Produkt nicht auf Lager");
+            }
+            //products.add(productToOrder.get());
         }
 
         Order newOrder = new Order(idService.generateId(), products, OrderStatus.PROCESSING, Instant.now());

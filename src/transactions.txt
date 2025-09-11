@@ -1,4 +1,4 @@
-addOrder A 1 2 3
-addOrder B 4 1
+addOrder A 1-2 2-4 3-3
+addOrder B 4-2 1-1
 setStatus A COMPLETED
 printOrders

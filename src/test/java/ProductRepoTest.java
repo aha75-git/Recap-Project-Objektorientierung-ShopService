@@ -11,14 +11,14 @@ class ProductRepoTest {
     void getProducts() {
         //GIVEN
         ProductRepo repo = new ProductRepo();
-        repo.addProduct(new Product("1", "Apfel"));
+        repo.addProduct(new Product("1", "Apfel", 10));
 
         //WHEN
         List<Product> actual = repo.getProducts();
 
         //THEN
         List<Product> expected = new ArrayList<>();
-        expected.add(new Product("1", "Apfel"));
+        expected.add(new Product("1", "Apfel", 10));
         assertEquals(actual, expected);
     }
 
@@ -26,13 +26,13 @@ class ProductRepoTest {
     void getProductById() {
         //GIVEN
         ProductRepo repo = new ProductRepo();
-        Product product = new Product("1", "Apfel");
+        Product product = new Product("1", "Apfel", 10);
         repo.addProduct(product);
         //WHEN
         Product actual = repo.getProductById("1").get();
 
         //THEN
-        Product expected = new Product("1", "Apfel");
+        Product expected = new Product("1", "Apfel", 10);
         assertEquals(actual, expected);
     }
 
@@ -40,13 +40,13 @@ class ProductRepoTest {
     void addProduct() {
         //GIVEN
         ProductRepo repo = new ProductRepo();
-        Product newProduct = new Product("2", "Banane");
+        Product newProduct = new Product("2", "Banane", 10);
 
         //WHEN
         Product actual = repo.addProduct(newProduct);
 
         //THEN
-        Product expected = new Product("2", "Banane");
+        Product expected = new Product("2", "Banane", 10);
         assertEquals(actual, expected);
         assertEquals(repo.getProductById("2").get(), expected);
     }
@@ -55,7 +55,7 @@ class ProductRepoTest {
     void removeProduct() {
         //GIVEN
         ProductRepo repo = new ProductRepo();
-        Product product = new Product("1", "Apfel");
+        Product product = new Product("1", "Apfel", 10);
         repo.addProduct(product);
 
         //WHEN

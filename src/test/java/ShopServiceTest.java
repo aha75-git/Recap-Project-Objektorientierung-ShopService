@@ -26,7 +26,7 @@ class ShopServiceTest {
         Order actual = shopService.addOrder(productsIdsWithQuantity);
 
         //THEN
-        Order expected = new Order("-1", List.of(new Product("1", "Apfel", 10)), OrderStatus.PROCESSING, Instant.now());
+        Order expected = new Order("-1", List.of(new Product("1", "Apfel", 2)), OrderStatus.PROCESSING, Instant.now());
         assertEquals(expected.products(), actual.products());
         assertNotNull(expected.id());
     }

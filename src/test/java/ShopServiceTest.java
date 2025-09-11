@@ -33,7 +33,7 @@ class ShopServiceTest {
     }
 
     @Test
-    void addOrderTest_whenInvalidProductId_expectNull() {
+    void addOrderTest_whenInvalidProductId_expectException() {
         //GIVEN
         OrderRepo orderRepo = new OrderMapRepo();
         ProductRepo productRepo = new ProductRepo();

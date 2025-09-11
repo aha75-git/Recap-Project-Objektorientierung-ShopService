@@ -1,4 +1,5 @@
 import exception.OrderNotFoundException;
+import exception.ProductOutOfStock;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,21 +20,20 @@ public class TransactionFileProcessing {
             Files.lines(Path.of(filePath)).forEach(command -> {
                 try {
                     processCommand(command);
-                } catch (OrderNotFoundException e) {
+                } catch (OrderNotFoundException | ProductOutOfStock e) {
                     System.out.println(e.getMessage());
                 }
             } );
 
     }
 
-    private void processCommand(String command) throws OrderNotFoundException {
+    private void processCommand(String command) throws OrderNotFoundException, ProductOutOfStock {
         String[] split = command.split(" ");
         switch (split[0]) {
             case "addOrder":
                 this.addOrder(split);
                 break;
             case "setStatus":
-                String status = split[1];
                 this.setStatus(split);
                 break;
             case "printOrders":
@@ -42,10 +42,15 @@ public class TransactionFileProcessing {
         }
     }
 
-    private void addOrder(String[] split) throws OrderNotFoundException {
+    private void addOrder(String[] split) throws OrderNotFoundException, ProductOutOfStock {
         String alias = split[1];
+        Map<String, Double> productIdsWithQuantity = new HashMap<>();
         List<String> productIds = new ArrayList<>(Arrays.asList(split).subList(2, split.length));
-        this.orderMap.put(alias, this.shopService.addOrder(productIds));
+        for (String productsOrder : productIds) {
+            String[] productArr = productsOrder.split("-");
+            productIdsWithQuantity.put(productArr[0], Double.parseDouble(productArr[1]));
+        }
+        this.orderMap.put(alias, this.shopService.addOrder(productIdsWithQuantity));
     }
 
     private void setStatus(String[] split) throws OrderNotFoundException {

@@ -10,12 +10,12 @@ public class Main {
         ProductRepo productRepo = new ProductRepo();
         IdService idService = () -> UUID.randomUUID().toString();
 
-        productRepo.addProduct(new Product("1", "Fussballschuhe"));
-        productRepo.addProduct(new Product("2", "T-Shirts"));
-        productRepo.addProduct(new Product("3", "Jacken"));
-        productRepo.addProduct(new Product("4", "Waschmittel"));
-        productRepo.addProduct(new Product("5", "Seife"));
-        productRepo.addProduct(new Product("6", "Weichspüler"));
+        productRepo.addProduct(new Product("1", "Fussballschuhe", 7));
+        productRepo.addProduct(new Product("2", "T-Shirts", 8));
+        productRepo.addProduct(new Product("3", "Jacken", 5));
+        productRepo.addProduct(new Product("4", "Waschmittel", 4));
+        productRepo.addProduct(new Product("5", "Seife", 12));
+        productRepo.addProduct(new Product("6", "Weichspüler", 5));
 
         ShopService shopService = new ShopService(productRepo, orderRepo, idService);
 
